@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover and support charity events with UnityAid.">
+    <title>UnityAid Charity Events</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html" aria-label="UnityAid home">
+                <span class="brand-mark">UA</span>
+                <span>UnityAid</span>
+            </a>
+            <nav class="main-nav" aria-label="Main navigation">
+                <a class="nav-link active" href="index.html">Home</a>
+                <a class="nav-link" href="search.html">Find Events</a>
+                <a class="nav-link" href="#about">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container hero-grid">
+                <div class="hero-copy">
+                    <span class="eyebrow">Together, we create lasting change</span>
+                    <h1>Small actions. Brighter communities.</h1>
+                    <p>
+                        UnityAid brings people together through meaningful events
+                        that raise funds and awareness for local causes.
+                    </p>
+                    <div class="hero-actions">
+                        <a class="button button-primary" href="#events">Explore Events</a>
+                        <a class="button button-secondary" href="search.html">Find an Event</a>
+                    </div>
+                </div>
+                <div class="hero-card" aria-hidden="true">
+                    <div class="hero-card-top">
+                        <span>Community impact</span>
+                        <span class="hero-badge">2026</span>
+                    </div>
+                    <div class="hero-illustration">
+                        <span class="circle circle-one"></span>
+                        <span class="circle circle-two"></span>
+                        <span class="circle circle-three"></span>
+                        <span class="heart">+</span>
+                    </div>
+                    <p>Every ticket and donation helps create real change.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section about" id="about">
+            <div class="container about-grid">
+                <div>
+                    <span class="eyebrow">Who we are</span>
+                    <h2>Connecting generosity with local needs.</h2>
+                </div>
+                <div class="about-copy">
+                    <p>
+                        UnityAid is a not-for-profit organisation committed to
+                        building stronger communities. We organise charity runs,
+                        gala dinners, auctions, concerts and community workshops.
+                    </p>
+                    <p>
+                        All proceeds support food, housing, education and wellbeing
+                        programs for people who need them most.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section events-section" id="events">
+            <div class="container">
+                <div class="section-heading">
+                    <div>
+                        <span class="eyebrow">Make a difference</span>
+                        <h2>Upcoming events</h2>
+                    </div>
+                    <a class="text-link" href="search.html">View and filter all events</a>
+                </div>
+
+                <p id="event-status" class="status-message" aria-live="polite">
+                    Loading events...
+                </p>
+                <div id="events-grid" class="events-grid" aria-busy="false"></div>
+            </div>
+        </section>
+
+        <section class="impact">
+            <div class="container impact-grid">
+                <div>
+                    <strong id="impact-raised">$0</strong>
+                    <span>Funds raised together</span>
+                </div>
+                <div>
+                    <strong id="impact-events">0</strong>
+                    <span>Community events</span>
+                </div>
+                <div>
+                    <strong>100%</strong>
+                    <span>Committed to local impact</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div>
+                <div class="brand footer-brand">
+                    <span class="brand-mark">UA</span>
+                    <span>UnityAid</span>
+                </div>
+                <p>Connecting communities and raising funds for people in need.</p>
+            </div>
+            <div>
+                <h3>Contact</h3>
+                <p>hello@unityaid.org</p>
+                <p>02 1234 5678</p>
+            </div>
+            <div>
+                <h3>Explore</h3>
+                <a href="index.html">Home</a>
+                <a href="search.html">Find Events</a>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>&copy; <span id="current-year"></span> UnityAid Charity Events</p>
+        </div>
+    </footer>
+
+    <script src="js/event-card.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>

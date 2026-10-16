@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Search active charity events with UnityAid.">
+    <title>UnityAid Charity Events</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html" aria-label="UnityAid home">
+                <span class="brand-mark">UA</span>
+                <span>UnityAid</span>
+            </a>
+            <nav class="main-nav" aria-label="Main navigation">
+                <a class="nav-link" href="index.html">Home</a>
+                <a class="nav-link active" href="search.html">Find Events</a>
+                <a class="nav-link" href="index.html#about">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <div class="container page-hero__inner">
+                <span class="eyebrow">Find your next cause</span>
+                <h1>Search charity events</h1>
+                <p>
+                    Filter by date, location or category to find an event
+                    that matters to you.
+                </p>
+            </div>
+        </section>
+
+        <section class="section search-page">
+            <div class="container">
+                <form id="search-form" class="search-panel" novalidate>
+                    <div class="search-form-grid">
+                        <div class="form-field">
+                            <label for="search-date">Date</label>
+                            <input id="search-date" name="date" type="date">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="search-location">Location</label>
+                            <input
+                                id="search-location"
+                                name="location"
+                                type="text"
+                                placeholder="e.g. Lismore"
+                                autocomplete="off"
+                            >
+                        </div>
+
+                        <div class="form-field">
+                            <label for="search-category">Category</label>
+                            <select id="search-category" name="category">
+                                <option value="">All categories</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="search-actions">
+                        <button class="button button-primary" type="submit">Search</button>
+                        <button id="clear-filters" class="button button-secondary" type="button">
+                            Clear Filters
+                        </button>
+                    </div>
+                </form>
+
+                <p id="search-status" class="status-message" aria-live="polite" aria-busy="false"></p>
+
+                <p id="filter-summary" class="filter-summary" aria-live="polite"></p>
+
+                <div class="results-heading">
+                    <span class="eyebrow">Matching events</span>
+                    <h2>Search results</h2>
+                </div>
+
+                <div id="search-results" class="events-grid" aria-busy="false"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div>
+                <div class="brand footer-brand">
+                    <span class="brand-mark">UA</span>
+                    <span>UnityAid</span>
+                </div>
+                <p>Connecting communities and raising funds for people in need.</p>
+            </div>
+            <div>
+                <h3>Contact</h3>
+                <p>hello@unityaid.org</p>
+                <p>02 1234 5678</p>
+            </div>
+            <div>
+                <h3>Explore</h3>
+                <a href="index.html">Home</a>
+                <a href="search.html">Find Events</a>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>&copy; <span id="current-year"></span> UnityAid Charity Events</p>
+        </div>
+    </footer>
+
+    <script src="js/event-card.js"></script>
+    <script src="js/search.js"></script>
+</body>
+</html>

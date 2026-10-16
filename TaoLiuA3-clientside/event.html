@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View charity event details with UnityAid.">
+    <title>UnityAid Charity Events</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html" aria-label="UnityAid home">
+                <span class="brand-mark">UA</span>
+                <span>UnityAid</span>
+            </a>
+            <nav class="main-nav" aria-label="Main navigation">
+                <a class="nav-link" href="index.html">Home</a>
+                <a class="nav-link" href="search.html">Find Events</a>
+                <a class="nav-link" href="index.html#about">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="detail-page">
+        <div class="container">
+            <p id="detail-status" class="status-message detail-status" aria-live="polite">
+                Loading event details...
+            </p>
+
+            <article id="event-detail" class="event-detail" hidden>
+                <div class="detail-hero-grid">
+                    <div class="detail-media">
+                        <img id="detail-image" src="" alt="">
+                    </div>
+
+                    <div class="detail-summary">
+                        <span id="detail-category" class="detail-category"></span>
+                        <h1 id="detail-name"></h1>
+                        <p id="detail-organisation" class="detail-organisation"></p>
+
+                        <div class="detail-meta-grid">
+                            <div>
+                                <span class="detail-meta-label">Date</span>
+                                <strong id="detail-date"></strong>
+                            </div>
+                            <div>
+                                <span class="detail-meta-label">Time</span>
+                                <strong id="detail-time"></strong>
+                            </div>
+                            <div>
+                                <span class="detail-meta-label">Location</span>
+                                <strong id="detail-location"></strong>
+                            </div>
+                            <div>
+                                <span class="detail-meta-label">Ticket</span>
+                                <strong id="detail-price"></strong>
+                            </div>
+                        </div>
+
+                        <button id="register-button" class="button button-primary register-button" type="button">
+                            Register
+                        </button>
+                    </div>
+                </div>
+
+                <div class="detail-content-grid">
+                    <section class="detail-description-panel">
+                        <span class="eyebrow">Why this event matters</span>
+                        <h2>About this event</h2>
+                        <p id="detail-description"></p>
+                    </section>
+
+                    <aside class="fundraising-card" aria-labelledby="fundraising-heading">
+                        <span class="eyebrow">Fundraising progress</span>
+                        <h2 id="fundraising-heading">Goal vs progress</h2>
+                        <div class="progress-track" id="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                            <div id="progress-fill" class="progress-fill"></div>
+                        </div>
+                        <p id="progress-percentage" class="progress-percentage">0%</p>
+                        <p id="fundraising-amounts" class="fundraising-amounts"></p>
+                    </aside>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <div id="registration-modal" class="modal" hidden>
+        <div class="modal-backdrop" data-close-modal></div>
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <button id="modal-close" class="modal-close" type="button" aria-label="Close dialog">&times;</button>
+            <span class="eyebrow">Registration</span>
+            <h2 id="modal-title">Coming soon</h2>
+            <p>This feature is currently under construction.</p>
+            <button id="modal-confirm" class="button button-primary" type="button">Close</button>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div>
+                <div class="brand footer-brand">
+                    <span class="brand-mark">UA</span>
+                    <span>UnityAid</span>
+                </div>
+                <p>Connecting communities and raising funds for people in need.</p>
+            </div>
+            <div>
+                <h3>Contact</h3>
+                <p>hello@unityaid.org</p>
+                <p>02 1234 5678</p>
+            </div>
+            <div>
+                <h3>Explore</h3>
+                <a href="index.html">Home</a>
+                <a href="search.html">Find Events</a>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>&copy; <span id="current-year"></span> UnityAid Charity Events</p>
+        </div>
+    </footer>
+
+    <script src="js/event-detail.js"></script>
+</body>
+</html>

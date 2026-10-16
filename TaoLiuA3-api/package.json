@@ -1,0 +1,20 @@
+{
+  "name": "taoliua3-api",
+  "version": "1.0.0",
+  "main": "event_db.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "UnityAid Charity Events A3 team project.",
+  "dependencies": {
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "mysql2": "^3.24.5"
+  }
+}
+
+
