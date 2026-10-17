@@ -1,35 +1,67 @@
 # UnityAid Charity Events
 
-This is the team project for PROG2002 Web Development II Assessment 3. It is a charity events website built with Node.js, Express and MySQL. The frontend uses plain HTML, CSS and JavaScript.
+Team project for PROG2002 Web Development II Assessment 3.
 
-## What the website does
+The project extends the Assessment 2 charity events website with event registration, registration records, event management APIs and an Angular admin-side website.
 
-- Shows current and upcoming charity events on the home page
-- Lets users search by date, location and category
-- Shows the details and fundraising progress for a selected event
-- Includes a Register button with an "under construction" message
+## Current Features
+
+- Dynamic charity event listing
+- Search by date, location and category
+- Event details and fundraising progress
+- Event registration database table
+- Ten sample registration records
+- Angular 22 workspace for the client and admin applications
+
+Registration pages, activity CRUD APIs and the admin interface are being developed for Assessment 3.
 
 ## Technologies
 
-- Node.js and Express for the server and API
-- MySQL for the database
-- HTML, CSS, JavaScript and DOM for the client website
-- mysql2 for the database connection
+- Node.js 22 and Express for the REST API
+- MySQL for persistent data
+- Angular 22 and TypeScript for the new client and admin applications
+- CSS for styling
+- mysql2 for database access
 - dotenv for local environment variables
 
-I did not use a CSS framework, JavaScript framework or template engine.
+## Project Structure
 
-## Database setup
+```text
+PROG2002-A3/
+├── TaoLiuA3-api/
+├── TaoLiuA3-clientside/
+├── TaoLiuA3-adminside/
+├── charity-events-angular/
+└── README.md
+```
 
-Import this file into MySQL:
+The `TaoLiuA3-clientside` and `TaoLiuA3-adminside` folders contain the original assessment baseline. The current Angular applications are under:
+
+```text
+charity-events-angular/projects/clientside
+charity-events-angular/projects/adminside
+```
+
+## Database Setup
+
+Import:
 
 ```text
 TaoLiuA3-api/database/charityevents_db.sql
 ```
 
-The script creates the `charityevents_db` database, three tables and eight sample events.
+The script creates:
 
-## Environment variables
+- `organisations`
+- `categories`
+- `events`
+- `registrations`
+- Eight sample events
+- Ten sample event registrations
+
+The registrations table includes a foreign key to `events`, a unique constraint preventing duplicate registration for the same email and event, a ticket-count check constraint and an event/date index.
+
+## Environment Variables
 
 Copy:
 
@@ -43,11 +75,9 @@ to:
 TaoLiuA3-api/.env
 ```
 
-Then replace `your_password` with your own MySQL password.
+Then set the local MySQL password.
 
-## How to run
-
-Open a terminal in the API folder and run:
+## Run the API
 
 ```bash
 cd TaoLiuA3-api
@@ -55,34 +85,33 @@ npm install
 node server.js
 ```
 
-Then open:
+## Run Angular Applications
 
-```text
-http://localhost:3000/
+```bash
+cd charity-events-angular
+npm install
+ng serve clientside --port 4200
 ```
 
-## Pages
+Open `http://localhost:4200/`.
 
-- Home: `http://localhost:3000/`
-- Search events: `http://localhost:3000/search.html`
-- Event details: `http://localhost:3000/event.html?id=2`
+To run the admin application:
 
-## API endpoints
+```bash
+ng serve adminside --port 4201
+```
+
+Open `http://localhost:4201/`.
+
+## Existing API Endpoints
 
 - `GET /api/events/home`
 - `GET /api/categories`
 - `GET /api/events`
 - `GET /api/events/:id`
 
-A search example:
+Assessment 3 registration and event-management endpoints will be added during development.
 
-```text
-GET /api/events?date=2026-11-07&location=Lismore&category=2
-```
+## Team
 
-## Author
-
-Tao Liu
-
-PROG2002 Web Development II
-
+PROG2002 Web Development II Assessment 3

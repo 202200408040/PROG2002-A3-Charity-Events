@@ -55,6 +55,32 @@ CREATE TABLE events (
 CREATE INDEX idx_events_status_date
 ON events (status, event_date);
 
+
+-- 4. Event registrations table
+CREATE TABLE registrations (
+    registration_id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id INT NOT NULL,
+    user_name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    phone VARCHAR(30) NOT NULL,
+    registration_date DATE NOT NULL,
+    number_of_tickets INT NOT NULL,
+
+    CONSTRAINT fk_registrations_event
+        FOREIGN KEY (event_id)
+        REFERENCES events(event_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    CONSTRAINT uq_registration_event_email
+        UNIQUE (event_id, email),
+
+    CONSTRAINT chk_registration_tickets
+        CHECK (number_of_tickets > 0)
+);
+
+CREATE INDEX idx_registrations_event_date
+ON registrations (event_id, registration_date);
 -- Insert a charity organisation
 INSERT INTO organisations (
     name,
@@ -165,4 +191,23 @@ INSERT INTO events (
     'suspended'
 );
 
+-- Insert ten sample event registrations
+INSERT INTO registrations (
+    event_id,
+    user_name,
+    email,
+    phone,
+    registration_date,
+    number_of_tickets
+) VALUES
+(1, 'Emma Wilson', 'emma.wilson@example.com', '0400 000 001', '2026-10-01', 2),
+(2, 'Emma Wilson', 'emma.wilson@example.com', '0400 000 001', '2026-10-02', 1),
+(2, 'Liam Chen', 'liam.chen@example.com', '0400 000 002', '2026-10-03', 2),
+(3, 'Sophia Brown', 'sophia.brown@example.com', '0400 000 003', '2026-10-04', 1),
+(4, 'Noah Taylor', 'noah.taylor@example.com', '0400 000 004', '2026-10-05', 2),
+(5, 'Ava Martin', 'ava.martin@example.com', '0400 000 005', '2026-10-06', 3),
+(7, 'Ethan Lee', 'ethan.lee@example.com', '0400 000 006', '2026-10-07', 4),
+(1, 'Mia Anderson', 'mia.anderson@example.com', '0400 000 007', '2026-10-08', 1),
+(3, 'Isla White', 'isla.white@example.com', '0400 000 008', '2026-10-09', 2),
+(4, 'Oliver Harris', 'oliver.harris@example.com', '0400 000 009', '2026-10-10', 3);
 
