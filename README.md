@@ -103,14 +103,31 @@ ng serve adminside --port 4201
 
 Open `http://localhost:4201/`.
 
-## Existing API Endpoints
+## API Endpoints
 
 - `GET /api/events/home`
 - `GET /api/categories`
 - `GET /api/events`
 - `GET /api/events/:id`
+- `POST /api/registrations`
 
-Assessment 3 registration and event-management endpoints will be added during development.
+`GET /api/events/:id` returns the event details, its registrations ordered by newest registration date, the registration count and the total tickets sold.
+
+Registration request body:
+
+```json
+{
+  "event_id": 2,
+  "user_name": "Liu Tao",
+  "email": "liu.tao@example.com",
+  "phone": "0400000000",
+  "number_of_tickets": 2
+}
+```
+
+The registration date is set by the server using `CURDATE()`. Duplicate registrations for the same email and event return HTTP 409.
+
+Event-management endpoints will be added during the admin website development.
 
 ## Team
 

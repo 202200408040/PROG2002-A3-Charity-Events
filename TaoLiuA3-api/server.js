@@ -39,6 +39,54 @@ function escapeLikePattern(value) {
     return value.replace(/[!%_]/g, "!$&");
 }
 
+
+/**
+ * Validates and normalises event registration input.
+ *
+ * @param {unknown} body The JSON request body.
+ * @returns {{ error: string } | { value: { eventId: number, userName: string, email: string, phone: string, numberOfTickets: number } }} Validation result.
+ */
+function parseRegistrationInput(body) {
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+        return { error: "Registration details are required" };
+    }
+
+    const eventId = Number(body.event_id);
+    const userName = typeof body.user_name === "string" ? body.user_name.trim() : "";
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    const phone = typeof body.phone === "string" ? body.phone.trim() : "";
+    const numberOfTickets = Number(body.number_of_tickets);
+
+    if (!Number.isSafeInteger(eventId) || eventId <= 0) {
+        return { error: "Event ID must be a positive integer" };
+    }
+
+    if (!userName || userName.length > 100) {
+        return { error: "User name is required and must not exceed 100 characters" };
+    }
+
+    if (!email || email.length > 150 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return { error: "A valid email address is required" };
+    }
+
+    if (!phone || phone.length > 30) {
+        return { error: "Phone number is required and must not exceed 30 characters" };
+    }
+
+    if (!Number.isSafeInteger(numberOfTickets) || numberOfTickets <= 0) {
+        return { error: "Number of tickets must be a positive integer" };
+    }
+
+    return {
+        value: {
+            eventId,
+            userName,
+            email,
+            phone,
+            numberOfTickets
+        }
+    };
+}
 function sendBadRequest(res, message) {
     return res.status(400).json({ message });
 }
@@ -171,7 +219,103 @@ app.get("/api/events", (req, res) => {
     });
 });
 
+// Registration API
+/**
+ * Creates a new registration for an active charity event.
+ *
+ * @param {import("express").Request} req Express request containing registration details.
+ * @param {import("express").Response} res Express response containing the created registration.
+ * @returns {void}
+ */
+app.post("/api/registrations", (req, res) => {
+    const parsed = parseRegistrationInput(req.body);
+
+    if (parsed.error) {
+        return sendBadRequest(res, parsed.error);
+    }
+
+    const { eventId, userName, email, phone, numberOfTickets } = parsed.value;
+    const eventSql = `
+        SELECT event_id, name
+        FROM events
+        WHERE event_id = ?
+          AND status = 'active'
+    `;
+
+    db.execute(eventSql, [eventId], (eventError, eventRows) => {
+        if (eventError) {
+            console.error("Registration event lookup failed:", eventError.message);
+            return res.status(500).json({ message: "Unable to create registration" });
+        }
+
+        if (eventRows.length === 0) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        const insertSql = `
+            INSERT INTO registrations (
+                event_id,
+                user_name,
+                email,
+                phone,
+                registration_date,
+                number_of_tickets
+            )
+            VALUES (?, ?, ?, ?, CURDATE(), ?)
+        `;
+
+        db.execute(
+            insertSql,
+            [eventId, userName, email, phone, numberOfTickets],
+            (insertError, result) => {
+                if (insertError) {
+                    if (insertError.code === "ER_DUP_ENTRY") {
+                        return res.status(409).json({
+                            message: "This email is already registered for this event"
+                        });
+                    }
+
+                    console.error("Registration insert failed:", insertError.message);
+                    return res.status(500).json({ message: "Unable to create registration" });
+                }
+
+                const selectSql = `
+                    SELECT
+                        registration_id,
+                        event_id,
+                        user_name,
+                        email,
+                        phone,
+                        registration_date,
+                        number_of_tickets
+                    FROM registrations
+                    WHERE registration_id = ?
+                `;
+
+                db.execute(selectSql, [result.insertId], (selectError, rows) => {
+                    if (selectError) {
+                        console.error("Registration read-back failed:", selectError.message);
+                        return res.status(500).json({ message: "Unable to create registration" });
+                    }
+
+                    return res.status(201).json({
+                        ...rows[0],
+                        event_name: eventRows[0].name
+                    });
+                });
+            }
+        );
+    });
+});
+
 // Event details API
+/**
+ * Retrieves one active event and its registrations, newest first.
+ *
+ * @param {import("express").Request} req Express request containing the event ID.
+ * @param {import("express").Response} res Express response containing event and registration data.
+ * @returns {void}
+ */
 app.get("/api/events/:id", (req, res) => {
     if (!/^[1-9]\d*$/.test(req.params.id)) {
         return sendBadRequest(res, "Invalid event ID");
@@ -183,7 +327,7 @@ app.get("/api/events/:id", (req, res) => {
         return sendBadRequest(res, "Invalid event ID");
     }
 
-    const sql = `
+    const eventSql = `
         SELECT
             e.event_id,
             e.name,
@@ -206,24 +350,50 @@ app.get("/api/events/:id", (req, res) => {
           AND e.status = 'active'
     `;
 
-    db.execute(sql, [eventId], (error, results) => {
-        if (error) {
-            console.error("Event details query failed:", error.message);
-            return res.status(500).json({
-                message: "Unable to retrieve event details"
-            });
+    db.execute(eventSql, [eventId], (eventError, eventRows) => {
+        if (eventError) {
+            console.error("Event details query failed:", eventError.message);
+            return res.status(500).json({ message: "Unable to retrieve event details" });
         }
 
-        if (results.length === 0) {
-            return res.status(404).json({
-                message: "Event not found"
-            });
+        if (eventRows.length === 0) {
+            return res.status(404).json({ message: "Event not found" });
         }
 
-        res.json(results[0]);
+        const registrationSql = `
+            SELECT
+                registration_id,
+                event_id,
+                user_name,
+                email,
+                phone,
+                registration_date,
+                number_of_tickets
+            FROM registrations
+            WHERE event_id = ?
+            ORDER BY registration_date DESC, registration_id DESC
+        `;
+
+        db.execute(registrationSql, [eventId], (registrationError, registrations) => {
+            if (registrationError) {
+                console.error("Event registrations query failed:", registrationError.message);
+                return res.status(500).json({ message: "Unable to retrieve event details" });
+            }
+
+            const ticketsSold = registrations.reduce(
+                (total, registration) => total + registration.number_of_tickets,
+                0
+            );
+
+            return res.json({
+                ...eventRows[0],
+                registrations,
+                registration_count: registrations.length,
+                tickets_sold: ticketsSold
+            });
+        });
     });
 });
-
 // Unknown API endpoint
 app.use("/api", (req, res) => {
     res.status(404).json({
@@ -252,4 +422,3 @@ app.use((error, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
-
