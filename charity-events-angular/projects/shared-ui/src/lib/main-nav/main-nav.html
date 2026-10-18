@@ -1,0 +1,14 @@
+<nav class="main-nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    @for (link of links(); track link.path) {
+      <a
+        class="nav-link"
+        [routerLink]="link.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: link.path === '/' }"
+      >
+        {{ link.label }}
+      </a>
+    }
+  </div>
+</nav>

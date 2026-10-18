@@ -1,0 +1,43 @@
+:host {
+  display: block;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(248, 245, 238, 0.96);
+  border-bottom: 1px solid #dfe8e3;
+  backdrop-filter: blur(12px);
+}
+
+.header-inner {
+  width: min(1120px, calc(100% - 40px));
+  min-height: 72px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  color: #18332d;
+  font-size: 1.18rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px 12px 12px 3px;
+  color: #ffffff;
+  background: #1f7a63;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  box-shadow: 0 8px 18px rgba(31, 122, 99, 0.25);
+}

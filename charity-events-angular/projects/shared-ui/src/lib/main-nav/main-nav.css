@@ -1,0 +1,26 @@
+:host {
+  display: block;
+  background: #f8f5ee;
+}
+
+.nav-inner {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  overflow-x: auto;
+}
+
+.nav-link {
+  color: #60736d;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #1f7a63;
+}

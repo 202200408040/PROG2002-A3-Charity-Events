@@ -12,7 +12,8 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "paths": {
-      "shared-data": ["./dist/shared-data"]
+      "shared-data": ["./dist/shared-data"],
+      "shared-ui": ["./dist/shared-ui"]
     },
     "target": "ES2022",
     "module": "preserve"
@@ -41,6 +42,12 @@
     },
     {
       "path": "./projects/shared-data/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/shared-ui/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/shared-ui/tsconfig.spec.json"
     }
   ]
 }
