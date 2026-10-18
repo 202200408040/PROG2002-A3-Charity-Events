@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+.placeholder-page {
+  width: min(1120px, calc(100% - 40px));
+  min-height: 55vh;
+  margin: 0 auto;
+  padding: 72px 0;
+}
+
+.eyebrow {
+  color: #1f7a63;
+  font-size: 0.77rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 12px 0;
+  color: #18332d;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+p {
+  color: #60736d;
+  font-size: 1.05rem;
+}
+
+.button {
+  display: inline-flex;
+  margin-top: 12px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #1f7a63;
+  font-weight: 750;
+  text-decoration: none;
+}

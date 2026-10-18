@@ -1,5 +1,107 @@
-<section class="placeholder-page">
-  <span class="eyebrow">Assessment 3</span>
-  <h1>Event Details</h1>
-  <p>Event details and registration records will appear here.</p>
-</section>
+@if (loading()) {
+  <section class="detail-state">
+    <p>Loading event details...</p>
+  </section>
+} @else if (error()) {
+  <section class="detail-state">
+    <p class="error">{{ error() }}</p>
+    <a class="button" routerLink="/">Back to Home</a>
+  </section>
+} @else if (event(); as selectedEvent) {
+  <section class="detail-page">
+    <div class="detail-inner">
+      <div class="detail-hero-grid">
+        <div class="detail-media">
+          <img [src]="imageUrl()" [alt]="selectedEvent.name + ' event image'" />
+        </div>
+
+        <div class="detail-summary">
+          <span class="detail-category">{{ selectedEvent.category }}</span>
+          <h1>{{ selectedEvent.name }}</h1>
+          <p class="detail-organisation">Hosted by {{ selectedEvent.organisation }}</p>
+
+          <div class="detail-meta-grid">
+            <div>
+              <span class="detail-meta-label">Date</span>
+              <strong>{{ formattedDate() }}</strong>
+            </div>
+            <div>
+              <span class="detail-meta-label">Time</span>
+              <strong>{{ formattedTime() }}</strong>
+            </div>
+            <div>
+              <span class="detail-meta-label">Location</span>
+              <strong>{{ selectedEvent.location }}</strong>
+            </div>
+            <div>
+              <span class="detail-meta-label">Ticket</span>
+              <strong>{{ formattedPrice() }}</strong>
+            </div>
+          </div>
+
+          <a
+            class="button button-primary register-button"
+            [routerLink]="registrationLink(selectedEvent.event_id)"
+          >
+            Register
+          </a>
+        </div>
+      </div>
+
+      <div class="detail-content-grid">
+        <section class="detail-panel">
+          <span class="eyebrow">Why this event matters</span>
+          <h2>About this event</h2>
+          <p>{{ selectedEvent.full_description }}</p>
+        </section>
+
+        <aside class="fundraising-card">
+          <span class="eyebrow">Fundraising progress</span>
+          <h2>Goal vs progress</h2>
+          <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="progress()">
+            <div class="progress-fill" [style.width.%]="progress()"></div>
+          </div>
+          <p class="progress-percentage">{{ progress() }}% funded</p>
+          <p class="fundraising-amounts">{{ currentAmount() }} raised of {{ fundraisingGoal() }}</p>
+        </aside>
+      </div>
+
+      <section class="registrations-panel">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">Supporters</span>
+            <h2>Event registrations</h2>
+          </div>
+          <p class="registration-summary">
+            {{ registrationCount() }} registrations · {{ ticketsSold() }} tickets
+          </p>
+        </div>
+
+        @if (!selectedEvent.registrations || selectedEvent.registrations.length === 0) {
+          <p class="empty-registrations">No registrations have been recorded for this event.</p>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Registration date</th>
+                  <th>Tickets</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (registration of selectedEvent.registrations; track registration.registration_id) {
+                  <tr>
+                    <td>{{ registration.user_name }}</td>
+                    <td>{{ formatRegistrationDate(registration.registration_date) }}</td>
+                    <td>{{ registration.number_of_tickets }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    </div>
+  </section>
+}

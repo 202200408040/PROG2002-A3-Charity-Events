@@ -20,6 +20,13 @@ export const routes: Routes = [
       import('./pages/about/about').then((module) => module.About),
   },
   {
+    path: 'events/:id/register',
+    loadComponent: () =>
+      import('./pages/registration/registration').then(
+        (module) => module.Registration
+      ),
+  },
+  {
     path: 'events/:id',
     loadComponent: () =>
       import('./pages/event-detail/event-detail').then(
@@ -31,3 +38,4 @@ export const routes: Routes = [
     redirectTo: '',
   },
 ];
+
