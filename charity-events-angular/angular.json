@@ -128,6 +128,32 @@
           "builder": "@angular/build:unit-test"
         }
       }
+    },
+    "shared-data": {
+      "projectType": "library",
+      "root": "projects/shared-data",
+      "sourceRoot": "projects/shared-data/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/shared-data/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/shared-data/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/shared-data/tsconfig.spec.json"
+          }
+        }
+      }
     }
   }
 }
