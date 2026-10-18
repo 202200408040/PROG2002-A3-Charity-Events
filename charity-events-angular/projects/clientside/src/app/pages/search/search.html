@@ -1,5 +1,85 @@
-<section class="placeholder-page">
-  <span class="eyebrow">Assessment 3</span>
-  <h1>Find Events</h1>
-  <p>Event search will be implemented in the next development step.</p>
+<section class="page-hero">
+  <div class="hero-inner">
+    <span class="eyebrow">Find your next cause</span>
+    <h1>Search charity events</h1>
+    <p>Filter by date, location or category to find an event that matters to you.</p>
+  </div>
+</section>
+
+<section class="search-page">
+  <div class="search-inner">
+    <form class="search-panel" [formGroup]="searchForm" (ngSubmit)="search()">
+      <div class="search-form-grid">
+        <div class="form-field">
+          <label for="search-date">Date</label>
+          <input id="search-date" type="date" formControlName="date" />
+        </div>
+
+        <div class="form-field">
+          <label for="search-location">Location</label>
+          <input
+            id="search-location"
+            type="text"
+            formControlName="location"
+            placeholder="e.g. Lismore"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="search-category">Category</label>
+          <select id="search-category" formControlName="category">
+            <option value="">All categories</option>
+            @for (category of categories(); track category.category_id) {
+              <option [value]="category.category_id">{{ category.name }}</option>
+            }
+          </select>
+          @if (categoriesLoading()) {
+            <small>Loading categories...</small>
+          }
+        </div>
+      </div>
+
+      <div class="search-actions">
+        <button class="button button-primary" type="submit" [disabled]="loading()">
+          Search
+        </button>
+        <button
+          class="button button-secondary"
+          type="button"
+          [disabled]="loading()"
+          (click)="clearFilters()"
+        >
+          Clear Filters
+        </button>
+      </div>
+    </form>
+
+    @if (error()) {
+      <p class="status-message error" aria-live="polite">{{ error() }}</p>
+    } @else if (loading()) {
+      <p class="status-message">Searching for events...</p>
+    } @else if (searched()) {
+      <p class="status-message">
+        Found {{ results().length }} matching event{{ results().length === 1 ? '' : 's' }}.
+      </p>
+    }
+
+    <p class="filter-summary">{{ filterSummary() }}</p>
+
+    <div class="results-heading">
+      <span class="eyebrow">Matching events</span>
+      <h2>Search results</h2>
+    </div>
+
+    @if (searched() && results().length === 0) {
+      <p class="status-message">No matching events found.</p>
+    }
+
+    <div class="events-grid">
+      @for (event of results(); track event.event_id) {
+        <app-event-card [event]="event" />
+      }
+    </div>
+  </div>
 </section>
