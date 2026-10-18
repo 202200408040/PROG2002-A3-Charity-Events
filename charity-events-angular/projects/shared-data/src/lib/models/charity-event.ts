@@ -7,6 +7,12 @@ export interface CharityEvent {
   /** Unique event identifier. */
   event_id: number;
 
+  /** Organisation identifier used by admin forms. */
+  organisation_id?: number;
+
+  /** Category identifier used by admin forms. */
+  category_id?: number;
+
   /** Public event name. */
   name: string;
 

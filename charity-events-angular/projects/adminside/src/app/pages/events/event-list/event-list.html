@@ -1,0 +1,74 @@
+<section class="admin-page">
+  <div class="admin-inner">
+    <div class="page-heading">
+      <div>
+        <span class="eyebrow">Administration</span>
+        <h1>Charity events</h1>
+        <p>View and manage all events, including past and suspended records.</p>
+      </div>
+      <a class="button button-primary" routerLink="/events/new">Create Event</a>
+    </div>
+
+    @if (successMessage()) {
+      <p class="status-message success" aria-live="polite">{{ successMessage() }}</p>
+    }
+
+    @if (error()) {
+      <p class="status-message error" aria-live="polite">{{ error() }}</p>
+    }
+
+    @if (loading()) {
+      <p class="status-message">Loading events...</p>
+    } @else if (events().length === 0) {
+      <p class="status-message">No events are currently available.</p>
+    } @else {
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Registrations</th>
+                <th>Tickets</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (event of events(); track event.event_id) {
+                <tr>
+                  <td>
+                    <strong>{{ event.name }}</strong>
+                    <span class="secondary-text">{{ event.location }}</span>
+                  </td>
+                  <td>{{ formatDate(event.event_date) }}</td>
+                  <td>{{ event.category }}</td>
+                  <td>
+                    <span class="status-badge" [class]="'status-' + displayStatus(event).toLowerCase()">
+                      {{ displayStatus(event) }}
+                    </span>
+                  </td>
+                  <td>{{ event.registration_count ?? 0 }}</td>
+                  <td>{{ event.tickets_sold ?? 0 }}</td>
+                  <td class="actions">
+                    <a [routerLink]="['/events', event.event_id, 'edit']">Edit</a>
+                    <button
+                      type="button"
+                      class="delete-button"
+                      [disabled]="deletingId() === event.event_id"
+                      (click)="deleteEvent(event)"
+                    >
+                      {{ deletingId() === event.event_id ? 'Deleting...' : 'Delete' }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</section>

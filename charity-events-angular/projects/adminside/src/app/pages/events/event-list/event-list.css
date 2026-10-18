@@ -1,0 +1,183 @@
+:host {
+  display: block;
+  background: #f8f5ee;
+}
+
+.admin-page {
+  min-height: 62vh;
+  padding: 58px 0 80px;
+}
+
+.admin-inner {
+  width: min(1200px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.page-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  color: #1f7a63;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 10px 0 6px;
+  color: #18332d;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.04em;
+}
+
+.page-heading p {
+  margin: 0;
+  color: #60736d;
+}
+
+.button {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.button-primary {
+  color: #ffffff;
+  background: #1f7a63;
+}
+
+.status-message {
+  margin: 0 0 20px;
+  color: #60736d;
+}
+
+.status-message.success {
+  color: #1f7a63;
+  font-weight: 700;
+}
+
+.status-message.error {
+  color: #9e332c;
+  font-weight: 700;
+}
+
+.table-card {
+  overflow: hidden;
+  border: 1px solid #dfe8e3;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 38px rgba(24, 51, 45, 0.07);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 15px 16px;
+  border-bottom: 1px solid #dfe8e3;
+  vertical-align: middle;
+}
+
+th {
+  color: #18332d;
+  background: #f7faf8;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+td {
+  color: #60736d;
+  font-size: 0.92rem;
+}
+
+td strong,
+.secondary-text {
+  display: block;
+}
+
+td strong {
+  color: #18332d;
+}
+
+.secondary-text {
+  margin-top: 3px;
+  font-size: 0.82rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.status-active {
+  color: #145746;
+  background: #dff1e9;
+}
+
+.status-past {
+  color: #72561c;
+  background: #f6e9ca;
+}
+
+.status-suspended {
+  color: #8c2f29;
+  background: #f7dfdc;
+}
+
+.actions {
+  white-space: nowrap;
+}
+
+.actions a,
+.delete-button {
+  border: 0;
+  background: transparent;
+  color: #145746;
+  cursor: pointer;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.delete-button {
+  margin-left: 14px;
+  color: #9e332c;
+}
+
+.delete-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 680px) {
+  .admin-inner {
+    width: min(calc(100% - 28px), 1200px);
+  }
+
+  .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

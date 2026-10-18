@@ -1,0 +1,174 @@
+<section class="admin-form-page">
+  <div class="admin-form-inner">
+    <div class="page-heading">
+      <div>
+        <span class="eyebrow">Administration</span>
+        <h1>{{ isEdit() ? 'Edit event' : 'Create event' }}</h1>
+        <p>Complete the event information and save your changes.</p>
+      </div>
+      <a class="button button-secondary" routerLink="/events">Back to Events</a>
+    </div>
+
+    @if (loading()) {
+      <p class="status-message">Loading event details...</p>
+    } @else {
+      @if (error()) {
+        <p class="status-message error" aria-live="polite">{{ error() }}</p>
+      }
+
+      <form class="event-form" [formGroup]="eventForm" (ngSubmit)="submit()" novalidate>
+        <div class="form-section">
+          <h2>Event information</h2>
+
+          <div class="form-grid">
+            <div class="form-field span-2">
+              <label for="name">Event name</label>
+              <input id="name" type="text" formControlName="name" />
+              @if (hasError('name')) { <small class="field-error">Event name is required.</small> }
+            </div>
+
+            <div class="form-field">
+              <label for="organisation-id">Organisation ID</label>
+              <input id="organisation-id" type="number" min="1" formControlName="organisation_id" />
+              @if (hasError('organisation_id')) { <small class="field-error">Enter a valid organisation ID.</small> }
+            </div>
+
+            <div class="form-field">
+              <label for="category-id">Category</label>
+              <select id="category-id" formControlName="category_id">
+                <option value="0">Select a category</option>
+                @for (category of categories(); track category.category_id) {
+                  <option [value]="category.category_id">{{ category.name }}</option>
+                }
+              </select>
+              @if (hasError('category_id')) { <small class="field-error">Select a category.</small> }
+            </div>
+
+            <div class="form-field span-2">
+              <label for="short-description">Short description</label>
+              <input id="short-description" type="text" formControlName="short_description" />
+              @if (hasError('short_description')) { <small class="field-error">Short description is required.</small> }
+            </div>
+
+            <div class="form-field span-2">
+              <label for="full-description">Full description</label>
+              <textarea id="full-description" rows="5" formControlName="full_description"></textarea>
+              @if (hasError('full_description')) { <small class="field-error">Full description is required.</small> }
+            </div>
+
+            <div class="form-field">
+              <label for="event-date">Event date</label>
+              <input id="event-date" type="date" formControlName="event_date" />
+              @if (hasError('event_date')) { <small class="field-error">Event date is required.</small> }
+            </div>
+
+            <div class="form-field">
+              <label for="event-time">Event time</label>
+              <input id="event-time" type="time" formControlName="event_time" />
+              @if (hasError('event_time')) { <small class="field-error">Event time is required.</small> }
+            </div>
+
+            <div class="form-field span-2">
+              <label for="location">Location</label>
+              <input id="location" type="text" formControlName="location" />
+              @if (hasError('location')) { <small class="field-error">Location is required.</small> }
+            </div>
+
+            <div class="form-field">
+              <label for="latitude">Latitude</label>
+              <input id="latitude" type="number" step="0.000001" formControlName="latitude" />
+              @if (hasError('latitude')) { <small class="field-error">Latitude must be between -90 and 90.</small> }
+            </div>
+
+            <div class="form-field">
+              <label for="longitude">Longitude</label>
+              <input id="longitude" type="number" step="0.000001" formControlName="longitude" />
+              @if (hasError('longitude')) { <small class="field-error">Longitude must be between -180 and 180.</small> }
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>Tickets and fundraising</h2>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="ticket-price">Ticket price</label>
+              <input id="ticket-price" type="number" min="0" step="0.01" formControlName="ticket_price" />
+            </div>
+
+            <div class="form-field">
+              <label for="fundraising-goal">Fundraising goal</label>
+              <input id="fundraising-goal" type="number" min="0" step="0.01" formControlName="fundraising_goal" />
+            </div>
+
+            <div class="form-field">
+              <label for="current-amount">Current amount</label>
+              <input id="current-amount" type="number" min="0" step="0.01" formControlName="current_amount" />
+            </div>
+
+            <div class="form-field">
+              <label for="status">Status</label>
+              <select id="status" formControlName="status">
+                <option value="active">Active</option>
+                <option value="suspended">Suspended</option>
+              </select>
+            </div>
+
+            <div class="form-field span-2">
+              <label for="image-url">Image URL</label>
+              <input id="image-url" type="text" formControlName="image_url" />
+              @if (hasError('image_url')) { <small class="field-error">Image URL is required.</small> }
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="button button-primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : (isEdit() ? 'Save Changes' : 'Create Event') }}
+          </button>
+          <a class="button button-secondary" routerLink="/events">Cancel</a>
+        </div>
+      </form>
+
+      @if (isEdit() && editingEvent(); as selectedEvent) {
+        <section class="registrations-card">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">Registrations</span>
+              <h2>Registered attendees</h2>
+            </div>
+            <p>{{ selectedEvent.registration_count ?? 0 }} registrations · {{ selectedEvent.tickets_sold ?? 0 }} tickets</p>
+          </div>
+
+          @if (!selectedEvent.registrations || selectedEvent.registrations.length === 0) {
+            <p class="status-message">This event has no registrations.</p>
+          } @else {
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Date</th>
+                    <th>Tickets</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (registration of selectedEvent.registrations; track registration.registration_id) {
+                    <tr>
+                      <td>{{ registration.user_name }}</td>
+                      <td>{{ registration.email }}</td>
+                      <td>{{ formatDate(registration.registration_date) }}</td>
+                      <td>{{ registration.number_of_tickets }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      }
+    }
+  </div>
+</section>

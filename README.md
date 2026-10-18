@@ -2,25 +2,27 @@
 
 Team project for PROG2002 Web Development II Assessment 3.
 
-The project extends the Assessment 2 charity events website with event registration, registration records, event management APIs and an Angular admin-side website.
+The project extends the Assessment 2 charity events website with event registration, registration records, event management APIs and an Angular 22 admin website. The public website and the admin website are separate Angular applications that share common models, services and layout components.
 
 ## Current Features
 
 - Dynamic charity event listing
 - Search by date, location and category
 - Event details and fundraising progress
-- Event registration database table
-- Ten sample registration records
-- Angular 22 workspace for the client and admin applications
+- Event registration with validation and duplicate protection
+- Registration records shown on event detail and admin pages
 - Open-Meteo weather information on event detail pages
-
-Event registration, event details and weather integration are implemented. Activity CRUD APIs and the admin interface are being developed for Assessment 3.
+- Admin event list showing active, past and suspended events
+- Admin create, edit and delete event workflows
+- Registration counts and tickets sold in the admin list
+- Shared header, navigation and footer components
+- Angular 22 and TypeScript for both front-end applications
 
 ## Technologies
 
 - Node.js 22 and Express for the REST API
 - MySQL for persistent data
-- Angular 22 and TypeScript for the new client and admin applications
+- Angular 22 and TypeScript for the client and admin applications
 - CSS for styling
 - mysql2 for database access
 - dotenv for local environment variables
@@ -42,6 +44,8 @@ The `TaoLiuA3-clientside` and `TaoLiuA3-adminside` folders contain the original 
 ```text
 charity-events-angular/projects/clientside
 charity-events-angular/projects/adminside
+charity-events-angular/projects/shared-data
+charity-events-angular/projects/shared-ui
 ```
 
 ## Database Setup
@@ -78,7 +82,7 @@ to:
 TaoLiuA3-api/.env
 ```
 
-Then set the local MySQL password.
+Then set the local MySQL password. The `.env` file is ignored by Git and must not be committed.
 
 ## Run the API
 
@@ -88,31 +92,62 @@ npm install
 node server.js
 ```
 
-## Run Angular Applications
+The API runs at `http://localhost:3000`.
+
+## Run the Angular Applications
+
+Install the Angular dependencies once:
 
 ```bash
 cd charity-events-angular
 npm install
-ng serve clientside --port 4200
+```
+
+Run the public website:
+
+```bash
+npx ng serve clientside --port 4200
 ```
 
 Open `http://localhost:4200/`.
 
-To run the admin application:
+Run the admin website in a second terminal:
 
 ```bash
-ng serve adminside --port 4201
+npx ng serve adminside --port 4201
 ```
 
 Open `http://localhost:4201/`.
 
+Both development servers use `proxy.conf.json` to forward `/api` requests to the Express API on port 3000.
+
+## Build
+
+```bash
+cd charity-events-angular
+npx ng build shared-data
+npx ng build shared-ui
+npx ng build clientside
+npx ng build adminside
+```
+
 ## API Endpoints
+
+Public endpoints:
 
 - `GET /api/events/home`
 - `GET /api/categories`
 - `GET /api/events`
 - `GET /api/events/:id`
 - `POST /api/registrations`
+
+Admin endpoints:
+
+- `GET /api/admin/events`
+- `GET /api/admin/events/:id`
+- `POST /api/events`
+- `PUT /api/events/:id`
+- `DELETE /api/events/:id`
 
 `GET /api/events/:id` returns the event details, its registrations ordered by newest registration date, the registration count and the total tickets sold.
 
@@ -130,7 +165,7 @@ Registration request body:
 
 The registration date is set by the server using `CURDATE()`. Duplicate registrations for the same email and event return HTTP 409.
 
-Event-management endpoints will be added during the admin website development.
+The admin list includes active, past and suspended events plus registration and ticket totals. Deleting an event that already has registrations returns HTTP 409 to protect registration history.
 
 ## Team
 
