@@ -91,6 +91,199 @@ function sendBadRequest(res, message) {
     return res.status(400).json({ message });
 }
 
+
+/**
+ * Validates a time value in HH:MM or HH:MM:SS format.
+ *
+ * @param {string} value Time value to validate.
+ * @returns {boolean} Whether the time is valid.
+ */
+function isValidTimeString(value) {
+    return /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test(value);
+}
+
+/**
+ * Validates and normalises event create or update data.
+ *
+ * @param {unknown} body The JSON request body.
+ * @returns {{ error: string } | { value: object }} Validation result.
+ */
+function parseEventInput(body) {
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+        return { error: "Event details are required" };
+    }
+
+    const organisationId = Number(body.organisation_id);
+    const categoryId = Number(body.category_id);
+    const name = typeof body.name === "string" ? body.name.trim() : "";
+    const shortDescription = typeof body.short_description === "string" ? body.short_description.trim() : "";
+    const fullDescription = typeof body.full_description === "string" ? body.full_description.trim() : "";
+    const eventDate = typeof body.event_date === "string" ? body.event_date.trim() : "";
+    const eventTime = typeof body.event_time === "string" ? body.event_time.trim() : "";
+    const location = typeof body.location === "string" ? body.location.trim() : "";
+    const latitude = Number(body.latitude);
+    const longitude = Number(body.longitude);
+    const ticketPrice = Number(body.ticket_price);
+    const fundraisingGoal = Number(body.fundraising_goal);
+    const currentAmount = Number(body.current_amount);
+    const imageUrl = typeof body.image_url === "string" && body.image_url.trim()
+        ? body.image_url.trim()
+        : "images/charity-gala.svg";
+    const status = typeof body.status === "string" ? body.status.trim() : "active";
+
+    if (!Number.isSafeInteger(organisationId) || organisationId <= 0) {
+        return { error: "Organisation ID must be a positive integer" };
+    }
+
+    if (!Number.isSafeInteger(categoryId) || categoryId <= 0) {
+        return { error: "Category ID must be a positive integer" };
+    }
+
+    if (!name || name.length > 150) {
+        return { error: "Event name is required and must not exceed 150 characters" };
+    }
+
+    if (!shortDescription || shortDescription.length > 255) {
+        return { error: "Short description is required and must not exceed 255 characters" };
+    }
+
+    if (!fullDescription) {
+        return { error: "Full description is required" };
+    }
+
+    if (!isValidDateString(eventDate)) {
+        return { error: "Event date must use a valid YYYY-MM-DD date" };
+    }
+
+    if (!isValidTimeString(eventTime)) {
+        return { error: "Event time must use HH:MM or HH:MM:SS format" };
+    }
+
+    if (!location || location.length > 150) {
+        return { error: "Location is required and must not exceed 150 characters" };
+    }
+
+    if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) {
+        return { error: "Latitude must be between -90 and 90" };
+    }
+
+    if (!Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+        return { error: "Longitude must be between -180 and 180" };
+    }
+
+    if (!Number.isFinite(ticketPrice) || ticketPrice < 0) {
+        return { error: "Ticket price must be zero or greater" };
+    }
+
+    if (!Number.isFinite(fundraisingGoal) || fundraisingGoal < 0) {
+        return { error: "Fundraising goal must be zero or greater" };
+    }
+
+    if (!Number.isFinite(currentAmount) || currentAmount < 0) {
+        return { error: "Current amount must be zero or greater" };
+    }
+
+    if (!["active", "suspended"].includes(status)) {
+        return { error: "Status must be active or suspended" };
+    }
+
+    return {
+        value: {
+            organisationId,
+            categoryId,
+            name,
+            shortDescription,
+            fullDescription,
+            eventDate,
+            eventTime,
+            location,
+            latitude,
+            longitude,
+            ticketPrice,
+            fundraisingGoal,
+            currentAmount,
+            imageUrl,
+            status
+        }
+    };
+}
+
+/**
+ * Loads an event and its registrations for administrative use.
+ *
+ * @param {number} eventId Event identifier.
+ * @param {(error: Error | null, event?: object | null) => void} callback Result callback.
+ * @returns {void}
+ */
+function loadAdminEvent(eventId, callback) {
+    const eventSql = `
+        SELECT
+            e.event_id,
+            e.organisation_id,
+            e.category_id,
+            e.name,
+            e.short_description,
+            e.full_description,
+            e.event_date,
+            e.event_time,
+            e.location,
+            e.latitude,
+            e.longitude,
+            e.ticket_price,
+            e.fundraising_goal,
+            e.current_amount,
+            e.image_url,
+            e.status,
+            c.name AS category,
+            o.name AS organisation
+        FROM events e
+        JOIN categories c ON c.category_id = e.category_id
+        JOIN organisations o ON o.organisation_id = e.organisation_id
+        WHERE e.event_id = ?
+    `;
+
+    db.execute(eventSql, [eventId], (eventError, eventRows) => {
+        if (eventError) {
+            return callback(eventError);
+        }
+
+        if (eventRows.length === 0) {
+            return callback(null, null);
+        }
+
+        const registrationSql = `
+            SELECT
+                registration_id,
+                event_id,
+                user_name,
+                email,
+                phone,
+                registration_date,
+                number_of_tickets
+            FROM registrations
+            WHERE event_id = ?
+            ORDER BY registration_date DESC, registration_id DESC
+        `;
+
+        db.execute(registrationSql, [eventId], (registrationError, registrations) => {
+            if (registrationError) {
+                return callback(registrationError);
+            }
+
+            const ticketsSold = registrations.reduce(
+                (total, registration) => total + registration.number_of_tickets,
+                0
+            );
+
+            callback(null, {
+                ...eventRows[0],
+                registrations,
+                registration_count: registrations.length,
+                tickets_sold: ticketsSold
+            });
+        });
+    });
+}
 // Homepage events API
 app.get("/api/events/home", (req, res) => {
     const sql = `
@@ -400,6 +593,344 @@ app.get("/api/events/:id", (req, res) => {
         });
     });
 });
+// Admin event list API
+/**
+ * Retrieves every event regardless of status for the admin website.
+ *
+ * @param {import("express").Request} req Express request.
+ * @param {import("express").Response} res Express response.
+ * @returns {void}
+ */
+app.get("/api/admin/events", (req, res) => {
+    const sql = `
+        SELECT
+            e.event_id,
+            e.organisation_id,
+            e.category_id,
+            e.name,
+            e.event_date,
+            e.event_time,
+            e.location,
+            e.status,
+            e.ticket_price,
+            c.name AS category,
+            o.name AS organisation,
+            (SELECT COUNT(*) FROM registrations r WHERE r.event_id = e.event_id) AS registration_count,
+            COALESCE((SELECT SUM(r.number_of_tickets) FROM registrations r WHERE r.event_id = e.event_id), 0) AS tickets_sold
+        FROM events e
+        JOIN categories c ON c.category_id = e.category_id
+        JOIN organisations o ON o.organisation_id = e.organisation_id
+        ORDER BY e.event_date DESC
+    `;
+
+    db.query(sql, (error, results) => {
+        if (error) {
+            console.error("Admin event list query failed:", error.message);
+            return res.status(500).json({ message: "Unable to retrieve admin events" });
+        }
+
+        res.json(results);
+    });
+});
+
+// Admin event details API
+/**
+ * Retrieves one event and its registrations for the admin website.
+ *
+ * @param {import("express").Request} req Express request containing the event ID.
+ * @param {import("express").Response} res Express response containing the event.
+ * @returns {void}
+ */
+app.get("/api/admin/events/:id", (req, res) => {
+    if (!/^[1-9]\d*$/.test(req.params.id)) {
+        return sendBadRequest(res, "Invalid event ID");
+    }
+
+    loadAdminEvent(Number(req.params.id), (error, event) => {
+        if (error) {
+            console.error("Admin event details query failed:", error.message);
+            return res.status(500).json({ message: "Unable to retrieve event" });
+        }
+
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        return res.json(event);
+    });
+});
+
+// Create event API
+/**
+ * Creates a new charity event.
+ *
+ * @param {import("express").Request} req Express request containing event data.
+ * @param {import("express").Response} res Express response containing the created event.
+ * @returns {void}
+ */
+app.post("/api/events", (req, res) => {
+    const parsed = parseEventInput(req.body);
+
+    if (parsed.error) {
+        return sendBadRequest(res, parsed.error);
+    }
+
+    const value = parsed.value;
+    const referenceSql = `
+        SELECT
+            (SELECT COUNT(*) FROM categories WHERE category_id = ?) AS category_exists,
+            (SELECT COUNT(*) FROM organisations WHERE organisation_id = ?) AS organisation_exists
+    `;
+
+    db.execute(referenceSql, [value.categoryId, value.organisationId], (referenceError, referenceRows) => {
+        if (referenceError) {
+            console.error("Event reference validation failed:", referenceError.message);
+            return res.status(500).json({ message: "Unable to create event" });
+        }
+
+        if (!referenceRows[0].category_exists) {
+            return sendBadRequest(res, "Selected category does not exist");
+        }
+
+        if (!referenceRows[0].organisation_exists) {
+            return sendBadRequest(res, "Selected organisation does not exist");
+        }
+
+        const insertSql = `
+            INSERT INTO events (
+                organisation_id,
+                category_id,
+                name,
+                short_description,
+                full_description,
+                event_date,
+                event_time,
+                location,
+                latitude,
+                longitude,
+                ticket_price,
+                fundraising_goal,
+                current_amount,
+                image_url,
+                status
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        db.execute(
+            insertSql,
+            [
+                value.organisationId,
+                value.categoryId,
+                value.name,
+                value.shortDescription,
+                value.fullDescription,
+                value.eventDate,
+                value.eventTime,
+                value.location,
+                value.latitude,
+                value.longitude,
+                value.ticketPrice,
+                value.fundraisingGoal,
+                value.currentAmount,
+                value.imageUrl,
+                value.status
+            ],
+            (insertError, result) => {
+                if (insertError) {
+                    console.error("Event insert failed:", insertError.message);
+                    return res.status(500).json({ message: "Unable to create event" });
+                }
+
+                loadAdminEvent(result.insertId, (loadError, createdEvent) => {
+                    if (loadError) {
+                        console.error("Created event read-back failed:", loadError.message);
+                        return res.status(500).json({ message: "Event created but could not be retrieved" });
+                    }
+
+                    return res.status(201).json(createdEvent);
+                });
+            }
+        );
+    });
+});
+
+// Update event API
+/**
+ * Updates an existing charity event.
+ *
+ * @param {import("express").Request} req Express request containing the event ID and updated data.
+ * @param {import("express").Response} res Express response containing the updated event.
+ * @returns {void}
+ */
+app.put("/api/events/:id", (req, res) => {
+    if (!/^[1-9]\d*$/.test(req.params.id)) {
+        return sendBadRequest(res, "Invalid event ID");
+    }
+
+    const parsed = parseEventInput(req.body);
+
+    if (parsed.error) {
+        return sendBadRequest(res, parsed.error);
+    }
+
+    const eventId = Number(req.params.id);
+    const value = parsed.value;
+    const referenceSql = `
+        SELECT
+            (SELECT COUNT(*) FROM categories WHERE category_id = ?) AS category_exists,
+            (SELECT COUNT(*) FROM organisations WHERE organisation_id = ?) AS organisation_exists
+    `;
+
+    db.execute(referenceSql, [value.categoryId, value.organisationId], (referenceError, referenceRows) => {
+        if (referenceError) {
+            console.error("Event reference validation failed:", referenceError.message);
+            return res.status(500).json({ message: "Unable to update event" });
+        }
+
+        if (!referenceRows[0].category_exists) {
+            return sendBadRequest(res, "Selected category does not exist");
+        }
+
+        if (!referenceRows[0].organisation_exists) {
+            return sendBadRequest(res, "Selected organisation does not exist");
+        }
+
+        const updateSql = `
+            UPDATE events
+            SET
+                organisation_id = ?,
+                category_id = ?,
+                name = ?,
+                short_description = ?,
+                full_description = ?,
+                event_date = ?,
+                event_time = ?,
+                location = ?,
+                latitude = ?,
+                longitude = ?,
+                ticket_price = ?,
+                fundraising_goal = ?,
+                current_amount = ?,
+                image_url = ?,
+                status = ?
+            WHERE event_id = ?
+        `;
+
+        db.execute(
+            updateSql,
+            [
+                value.organisationId,
+                value.categoryId,
+                value.name,
+                value.shortDescription,
+                value.fullDescription,
+                value.eventDate,
+                value.eventTime,
+                value.location,
+                value.latitude,
+                value.longitude,
+                value.ticketPrice,
+                value.fundraisingGoal,
+                value.currentAmount,
+                value.imageUrl,
+                value.status,
+                eventId
+            ],
+            (updateError) => {
+                if (updateError) {
+                    console.error("Event update failed:", updateError.message);
+                    return res.status(500).json({ message: "Unable to update event" });
+                }
+
+                loadAdminEvent(eventId, (loadError, updatedEvent) => {
+                    if (loadError) {
+                        console.error("Updated event read-back failed:", loadError.message);
+                        return res.status(500).json({ message: "Unable to update event" });
+                    }
+
+                    if (!updatedEvent) {
+                        return res.status(404).json({ message: "Event not found" });
+                    }
+
+                    return res.json(updatedEvent);
+                });
+            }
+        );
+    });
+});
+
+// Delete event API
+/**
+ * Deletes an event only when no registrations exist.
+ *
+ * @param {import("express").Request} req Express request containing the event ID.
+ * @param {import("express").Response} res Express response indicating the result.
+ * @returns {void}
+ */
+app.delete("/api/events/:id", (req, res) => {
+    if (!/^[1-9]\d*$/.test(req.params.id)) {
+        return sendBadRequest(res, "Invalid event ID");
+    }
+
+    const eventId = Number(req.params.id);
+    const deleteSql = `
+        DELETE FROM events
+        WHERE event_id = ?
+          AND NOT EXISTS (
+              SELECT 1
+              FROM registrations
+              WHERE registrations.event_id = events.event_id
+          )
+    `;
+
+    db.execute(deleteSql, [eventId], (deleteError, result) => {
+        if (deleteError) {
+            if (deleteError.code === "ER_ROW_IS_REFERENCED_2") {
+                return res.status(409).json({
+                    message: "Cannot delete an event that has registrations"
+                });
+            }
+
+            console.error("Event delete failed:", deleteError.message);
+            return res.status(500).json({ message: "Unable to delete event" });
+        }
+
+        if (result.affectedRows > 0) {
+            return res.json({ message: "Event deleted successfully" });
+        }
+
+        const statusSql = `
+            SELECT
+                e.event_id,
+                COUNT(r.registration_id) AS registration_count
+            FROM events e
+            LEFT JOIN registrations r ON r.event_id = e.event_id
+            WHERE e.event_id = ?
+            GROUP BY e.event_id
+        `;
+
+        db.execute(statusSql, [eventId], (statusError, rows) => {
+            if (statusError) {
+                console.error("Event delete status query failed:", statusError.message);
+                return res.status(500).json({ message: "Unable to delete event" });
+            }
+
+            if (rows.length === 0) {
+                return res.status(404).json({ message: "Event not found" });
+            }
+
+            if (rows[0].registration_count > 0) {
+                return res.status(409).json({
+                    message: "Cannot delete an event that has registrations"
+                });
+            }
+
+            return res.status(409).json({ message: "Event could not be deleted" });
+        });
+    });
+});
+
 // Unknown API endpoint
 app.use("/api", (req, res) => {
     res.status(404).json({
