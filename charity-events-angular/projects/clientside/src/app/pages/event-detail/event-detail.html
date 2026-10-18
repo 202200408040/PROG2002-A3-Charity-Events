@@ -55,16 +55,56 @@
           <p>{{ selectedEvent.full_description }}</p>
         </section>
 
-        <aside class="fundraising-card">
-          <span class="eyebrow">Fundraising progress</span>
-          <h2>Goal vs progress</h2>
-          <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="progress()">
-            <div class="progress-fill" [style.width.%]="progress()"></div>
-          </div>
-          <p class="progress-percentage">{{ progress() }}% funded</p>
-          <p class="fundraising-amounts">{{ currentAmount() }} raised of {{ fundraisingGoal() }}</p>
-        </aside>
+        <div class="detail-sidebar">
+          <aside class="fundraising-card">
+            <span class="eyebrow">Fundraising progress</span>
+            <h2>Goal vs progress</h2>
+            <div
+              class="progress-track"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-valuenow]="progress()"
+            >
+              <div class="progress-fill" [style.width.%]="progress()"></div>
+            </div>
+            <p class="progress-percentage">{{ progress() }}% funded</p>
+            <p class="fundraising-amounts">
+              {{ currentAmount() }} raised of {{ fundraisingGoal() }}
+            </p>
+          </aside>
+
+          <aside class="weather-card">
+            <span class="eyebrow">Event location weather</span>
+            <h2>Weather</h2>
+
+            @if (weatherLoading()) {
+              <p class="weather-note">Loading weather information...</p>
+            } @else if (weatherError()) {
+              <p class="weather-note">{{ weatherError() }}</p>
+            } @else if (weather(); as weatherData) {
+              <div class="weather-main">
+                <strong>{{ weatherData.temperature | number: '1.0-0' }}°C</strong>
+                <span>{{ weatherData.condition }}</span>
+              </div>
+
+              @if (weatherData.forecastAvailable) {
+                <p class="weather-note">
+                  High {{ weatherData.temperatureMax | number: '1.0-0' }}°C ·
+                  Low {{ weatherData.temperatureMin | number: '1.0-0' }}°C
+                </p>
+                <p class="weather-note">{{ weatherData.dateLabel }}</p>
+              } @else {
+                <p class="weather-note">
+                  {{ weatherData.dateLabel }}. A detailed forecast becomes
+                  available closer to the event date.
+                </p>
+              }
+            }
+          </aside>
+        </div>
       </div>
+
 
       <section class="registrations-panel">
         <div class="section-heading">

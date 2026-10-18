@@ -34,6 +34,8 @@ CREATE TABLE events (
     event_date DATE NOT NULL,
     event_time TIME NOT NULL,
     location VARCHAR(150) NOT NULL,
+    latitude DECIMAL(9,6) NOT NULL,
+    longitude DECIMAL(9,6) NOT NULL,
 
     ticket_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     fundraising_goal DECIMAL(12,2) NOT NULL DEFAULT 0.00,
@@ -112,6 +114,8 @@ INSERT INTO events (
     event_date,
     event_time,
     location,
+    latitude,
+    longitude,
     ticket_price,
     fundraising_goal,
     current_amount,
@@ -123,6 +127,7 @@ INSERT INTO events (
     'Run or walk to support local families.',
     'Join our annual City Fun Run. Participants can choose a 5 km or 10 km route. All money raised supports local families facing financial hardship.',
     '2026-10-18', '08:00:00', 'Lismore Riverside Park',
+    -28.813300, 153.277300,
     0.00, 10000.00, 4200.00,
     'images/city-fun-run.svg',
     'active'
@@ -132,6 +137,7 @@ INSERT INTO events (
     'An evening of dinner, music and fundraising.',
     'Enjoy a three-course dinner while supporting community programs. The evening includes live music, guest speakers and a charity auction.',
     '2026-11-07', '18:30:00', 'Lismore Community Hall',
+    -28.813900, 153.279200,
     120.00, 25000.00, 12800.00,
     'images/charity-gala.svg',
     'active'
@@ -141,6 +147,7 @@ INSERT INTO events (
     'Bid on local artwork and support charity projects.',
     'Local artists have donated paintings, prints and sculptures. All proceeds will fund food, housing and education programs.',
     '2026-11-21', '17:00:00', 'Northern Rivers Gallery',
+    -28.807500, 153.274800,
     50.00, 15000.00, 6750.00,
     'images/silent-auction.svg',
     'active'
@@ -150,6 +157,7 @@ INSERT INTO events (
     'A live music event for the whole community.',
     'Enjoy performances from local musicians while helping raise funds for children and families in need.',
     '2026-12-05', '19:00:00', 'Lismore City Hall',
+    -28.812800, 153.278700,
     75.00, 20000.00, 9200.00,
     'images/hope-concert.svg',
     'active'
@@ -159,6 +167,7 @@ INSERT INTO events (
     'Learn sustainable gardening and meet neighbours.',
     'This free workshop teaches composting, seasonal planting and water-saving gardening techniques.',
     '2026-10-25', '10:00:00', 'East Lismore Community Centre',
+    -28.824200, 153.300400,
     0.00, 3000.00, 850.00,
     'images/garden-workshop.svg',
     'active'
@@ -168,6 +177,7 @@ INSERT INTO events (
     'A past event used to test date filtering.',
     'Participants walked through the city and collected donations for local food banks. This event has already finished.',
     '2026-08-15', '09:00:00', 'Lismore Town Centre',
+    -28.813500, 153.276300,
     10.00, 8000.00, 8000.00,
     'images/city-fun-run.svg',
     'active'
@@ -177,6 +187,7 @@ INSERT INTO events (
     'A team golf event supporting youth programs.',
     'Teams of four compete in a friendly charity tournament. The registration fee includes lunch and prizes.',
     '2027-01-16', '07:30:00', 'Lismore Golf Club',
+    -28.836900, 153.274900,
     150.00, 30000.00, 11500.00,
     'images/golf-day.svg',
     'active'
@@ -186,6 +197,7 @@ INSERT INTO events (
     'A suspended event that must not appear on the home page.',
     'This event is suspended because it does not meet the charity policy requirements.',
     '2026-12-19', '18:00:00', 'Ballina Entertainment Centre',
+    -28.861600, 153.566000,
     60.00, 12000.00, 0.00,
     'images/hope-concert.svg',
     'suspended'
@@ -210,4 +222,3 @@ INSERT INTO registrations (
 (1, 'Mia Anderson', 'mia.anderson@example.com', '0400 000 007', '2026-10-08', 1),
 (3, 'Isla White', 'isla.white@example.com', '0400 000 008', '2026-10-09', 2),
 (4, 'Oliver Harris', 'oliver.harris@example.com', '0400 000 009', '2026-10-10', 3);
-

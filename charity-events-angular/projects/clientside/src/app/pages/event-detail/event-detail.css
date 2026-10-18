@@ -292,3 +292,46 @@ td {
     flex-direction: column;
   }
 }
+
+.detail-sidebar {
+  display: grid;
+  gap: 24px;
+}
+
+.weather-main {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.weather-main strong {
+  color: #18332d;
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.weather-main span {
+  color: #145746;
+  font-weight: 750;
+}
+
+.weather-note {
+  margin: 12px 0 0;
+  color: #60736d;
+}
+
+@media (max-width: 620px) {
+  .detail-panel,
+  .fundraising-card,
+  .weather-card {
+    padding: 22px;
+  }
+}
+
+.weather-card {
+  padding: 32px;
+  border: 1px solid #dfe8e3;
+  border-radius: 26px;
+  background: #ffffff;
+}

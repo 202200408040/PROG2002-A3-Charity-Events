@@ -12,8 +12,9 @@ The project extends the Assessment 2 charity events website with event registrat
 - Event registration database table
 - Ten sample registration records
 - Angular 22 workspace for the client and admin applications
+- Open-Meteo weather information on event detail pages
 
-Registration pages, activity CRUD APIs and the admin interface are being developed for Assessment 3.
+Event registration, event details and weather integration are implemented. Activity CRUD APIs and the admin interface are being developed for Assessment 3.
 
 ## Technologies
 
@@ -23,6 +24,7 @@ Registration pages, activity CRUD APIs and the admin interface are being develop
 - CSS for styling
 - mysql2 for database access
 - dotenv for local environment variables
+- Open-Meteo API for event location weather
 
 ## Project Structure
 
@@ -58,6 +60,7 @@ The script creates:
 - `registrations`
 - Eight sample events
 - Ten sample event registrations
+- Latitude and longitude for each sample event
 
 The registrations table includes a foreign key to `events`, a unique constraint preventing duplicate registration for the same email and event, a ticket-count check constraint and an event/date index.
 

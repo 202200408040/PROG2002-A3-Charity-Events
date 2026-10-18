@@ -1,14 +1,17 @@
+import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CharityEvent, EventRegistration, EventService } from 'shared-data';
+import { CharityEvent, EventService } from 'shared-data';
+import { WeatherSummary } from '../../core/models/weather-summary';
+import { WeatherService } from '../../core/services/weather.service';
 
 /**
  * Displays full details and registrations for one charity event.
  */
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, DecimalPipe],
   selector: 'app-event-detail',
   styleUrl: './event-detail.css',
   templateUrl: './event-detail.html',
@@ -16,6 +19,7 @@ import { CharityEvent, EventRegistration, EventService } from 'shared-data';
 export class EventDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly eventService = inject(EventService);
+  private readonly weatherService = inject(WeatherService);
   private readonly title = inject(Title);
 
   /** Selected event returned by the API. */
@@ -26,6 +30,15 @@ export class EventDetail implements OnInit {
 
   /** User-facing error message. */
   readonly error = signal('');
+
+  /** Weather information for the event location. */
+  readonly weather = signal<WeatherSummary | null>(null);
+
+  /** Indicates that weather information is loading. */
+  readonly weatherLoading = signal(false);
+
+  /** Weather request error message. */
+  readonly weatherError = signal('');
 
   /** Formatted event date. */
   readonly formattedDate = computed(() => {
@@ -44,7 +57,9 @@ export class EventDetail implements OnInit {
   });
 
   /** Formatted event start time. */
-  readonly formattedTime = computed(() => this.event()?.event_time.slice(0, 5) ?? '');
+  readonly formattedTime = computed(
+    () => this.event()?.event_time.slice(0, 5) ?? ''
+  );
 
   /** Formatted ticket price. */
   readonly formattedPrice = computed(() => {
@@ -74,7 +89,10 @@ export class EventDetail implements OnInit {
       return 0;
     }
 
-    return Math.min(100, Math.round((Number(event.current_amount) / goal) * 100));
+    return Math.min(
+      100,
+      Math.round((Number(event.current_amount) / goal) * 100)
+    );
   });
 
   /** Formatted current fundraising amount. */
@@ -97,7 +115,10 @@ export class EventDetail implements OnInit {
 
   /** Number of registrations for the selected event. */
   readonly registrationCount = computed(
-    () => this.event()?.registration_count ?? this.event()?.registrations?.length ?? 0
+    () =>
+      this.event()?.registration_count ??
+      this.event()?.registrations?.length ??
+      0
   );
 
   /** Total tickets sold for the selected event. */
@@ -140,17 +161,6 @@ export class EventDetail implements OnInit {
   }
 
   /**
-   * Tracks registration rows by their identifier.
-   *
-   * @param _index Row index.
-   * @param registration Registration data.
-   * @returns The registration ID.
-   */
-  trackRegistration(_index: number, registration: EventRegistration): number {
-    return registration.registration_id;
-  }
-
-  /**
    * Loads the event represented by the route ID.
    *
    * @param idValue Route parameter value.
@@ -158,6 +168,9 @@ export class EventDetail implements OnInit {
    */
   private loadEvent(idValue: string | null): void {
     this.event.set(null);
+    this.weather.set(null);
+    this.weatherError.set('');
+    this.weatherLoading.set(false);
     this.loading.set(true);
     this.error.set('');
 
@@ -171,6 +184,7 @@ export class EventDetail implements OnInit {
       next: (event) => {
         this.event.set(event);
         this.title.setTitle(`${event.name} | UnityAid Charity Events`);
+        this.loadWeather(event);
       },
       error: (error: HttpErrorResponse) => {
         this.error.set(
@@ -184,6 +198,40 @@ export class EventDetail implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  /**
+   * Loads current or forecast weather for the selected event location.
+   *
+   * @param event Selected charity event.
+   * @returns Nothing.
+   */
+  private loadWeather(event: CharityEvent): void {
+    const latitude = Number(event.latitude);
+    const longitude = Number(event.longitude);
+
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+      this.weatherError.set('Weather data is unavailable for this event.');
+      return;
+    }
+
+    this.weatherLoading.set(true);
+    this.weatherError.set('');
+
+    this.weatherService
+      .getEventWeather(latitude, longitude, event.event_date)
+      .subscribe({
+        next: (weather) => {
+          this.weather.set(weather);
+        },
+        error: () => {
+          this.weatherError.set('Unable to load weather information.');
+          this.weatherLoading.set(false);
+        },
+        complete: () => {
+          this.weatherLoading.set(false);
+        },
+      });
   }
 
   /**

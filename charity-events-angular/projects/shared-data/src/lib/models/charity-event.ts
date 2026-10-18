@@ -25,6 +25,12 @@ export interface CharityEvent {
   /** Event location. */
   location: string;
 
+  /** Event latitude used for weather data. */
+  latitude?: number | string;
+
+  /** Event longitude used for weather data. */
+  longitude?: number | string;
+
   /** Ticket price returned by MySQL as a decimal string. */
   ticket_price: string;
 
