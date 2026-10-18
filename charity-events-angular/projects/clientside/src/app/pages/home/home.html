@@ -1,0 +1,94 @@
+<section class="hero">
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow">Together, we create lasting change</span>
+      <h1>Small actions. Brighter communities.</h1>
+      <p>
+        UnityAid brings people together through meaningful events that raise
+        funds and awareness for local causes.
+      </p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="#events">Explore Events</a>
+        <a class="button button-secondary" routerLink="/search">Find an Event</a>
+      </div>
+    </div>
+
+    <div class="hero-card" aria-hidden="true">
+      <div class="hero-card-top">
+        <span>Community impact</span>
+        <span class="hero-badge">2026</span>
+      </div>
+      <div class="hero-illustration">
+        <span class="circle circle-one"></span>
+        <span class="circle circle-two"></span>
+        <span class="circle circle-three"></span>
+        <span class="heart">+</span>
+      </div>
+      <p>Every ticket and donation helps create real change.</p>
+    </div>
+  </div>
+</section>
+
+<section class="about-section" id="about">
+  <div class="section-inner about-grid">
+    <div>
+      <span class="eyebrow">Who we are</span>
+      <h2>Connecting generosity with local needs.</h2>
+    </div>
+    <div class="about-copy">
+      <p>
+        UnityAid is a not-for-profit organisation committed to building stronger
+        communities. We organise charity runs, gala dinners, auctions, concerts
+        and community workshops.
+      </p>
+      <p>
+        All proceeds support food, housing, education and wellbeing programs for
+        people who need them most.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="events-section" id="events">
+  <div class="section-inner">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Make a difference</span>
+        <h2>Upcoming events</h2>
+      </div>
+      <a class="text-link" routerLink="/search">View and filter all events</a>
+    </div>
+
+    @if (loading()) {
+      <p class="status-message">Loading events...</p>
+    } @else if (error()) {
+      <p class="status-message error">{{ error() }}</p>
+    } @else if (events().length === 0) {
+      <p class="status-message">No upcoming events are currently available.</p>
+    } @else {
+      <p class="status-message">Showing {{ events().length }} upcoming events.</p>
+      <div class="events-grid">
+        @for (event of events(); track event.event_id) {
+          <app-event-card [event]="event" />
+        }
+      </div>
+    }
+  </div>
+</section>
+
+<section class="impact-strip">
+  <div class="section-inner impact-grid">
+    <div>
+      <strong>{{ fundsLabel() }}</strong>
+      <span>Funds raised together</span>
+    </div>
+    <div>
+      <strong>{{ eventCount() }}</strong>
+      <span>Community events</span>
+    </div>
+    <div>
+      <strong>100%</strong>
+      <span>Committed to local impact</span>
+    </div>
+  </div>
+</section>

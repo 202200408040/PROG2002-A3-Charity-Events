@@ -1,0 +1,28 @@
+<article class="event-card">
+  <div class="event-card__image-wrap">
+    <img
+      class="event-card__image"
+      [src]="imageUrl()"
+      [alt]="event().name + ' event image'"
+      loading="lazy"
+    />
+    <span class="event-card__category">{{ event().category }}</span>
+  </div>
+
+  <div class="event-card__body">
+    <h3>{{ event().name }}</h3>
+    <p class="event-card__description">{{ event().short_description }}</p>
+
+    <div class="event-meta">
+      <span><strong>Date:</strong> {{ formattedDate() }}</span>
+      <span><strong>Location:</strong> {{ event().location }}</span>
+    </div>
+
+    <div class="event-card__footer">
+      <span class="event-price">{{ formattedPrice() }}</span>
+      <a class="event-link" [routerLink]="['/events', event().event_id]">
+        View Details
+      </a>
+    </div>
+  </div>
+</article>
