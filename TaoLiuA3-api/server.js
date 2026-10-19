@@ -3,17 +3,17 @@ const path = require("path");
 const db = require("./event_db");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const MAX_LOCATION_LENGTH = 100;
 
 app.disable("x-powered-by");
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../TaoLiuA3-clientside")));
-
+app.use("/", express.static(path.join(__dirname, "public/client")));
+app.use("/admin", express.static(path.join(__dirname, "public/admin")));
 function getQueryString(value) {
     if (value === undefined) {
         return "";
-    }
+    }   
 
     if (Array.isArray(value) || typeof value !== "string") {
         return null;
@@ -938,10 +938,16 @@ app.use("/api", (req, res) => {
     });
 });
 
-// Unknown webpage or static file
-app.use((req, res) => {
-    res.status(404).send("Page not found");
+// SPA fallback for admin panel 
+app.get("/admin/{*splat}", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/admin/index.html"));
 });
+
+// SPA fallback for client website 
+app.get("/{*splat}", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/client/index.html"));
+});
+
 
 // Unexpected server error
 app.use((error, req, res, next) => {
